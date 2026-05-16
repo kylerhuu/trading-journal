@@ -1,5 +1,4 @@
-import Link from "next/link";
-
+import { SettingsAuthCard } from "@/app/(app)/settings/settings-auth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function SettingsPage() {
@@ -14,6 +13,8 @@ export default function SettingsPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
+        <SettingsAuthCard />
+
         <Card className="rounded-xl border-border bg-card">
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Environment variables</CardTitle>
@@ -45,6 +46,9 @@ export default function SettingsPage() {
             </div>
             <div>
               - Run <span className="font-mono text-foreground">supabase/storage-policies.sql</span> after creating the bucket.
+            </div>
+            <div>
+              - Enable <strong>Email</strong> under Authentication → Providers, then sign in above for cloud screenshots.
             </div>
             <div>
               Without Supabase, trades save to <span className="font-mono text-foreground">localStorage</span> in this browser.

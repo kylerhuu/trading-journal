@@ -10,7 +10,8 @@ import {
   fetchScreenshotsFromBrowser,
 } from "@/lib/trades/fetch-trades.client";
 import { seedLocalTradesIfEmpty, upsertTradeLocal } from "@/lib/trades/local-store";
-import { isSupabaseConfigured, shouldUseMockData } from "@/lib/mock-mode";
+import { useAuth } from "@/components/auth/auth-provider";
+import { shouldUseMockData } from "@/lib/mock-mode";
 import type { Trade, TradeScreenshot } from "@/types/database";
 
 interface TradesContextValue {
@@ -113,7 +114,8 @@ export function useTradesOptional() {
   return React.useContext(TradesContext);
 }
 
-/** Client-only: whether screenshots can upload to Supabase Storage. */
+/** Client-only: signed in with Supabase (screenshots can upload to Storage). */
 export function useCanUploadToSupabase() {
-  return isSupabaseConfigured();
+  const { authConfigured, isSignedIn } = useAuth();
+  return authConfigured && isSignedIn;
 }

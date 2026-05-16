@@ -5,6 +5,7 @@ import { Menu } from "lucide-react";
 import { usePathname } from "next/navigation";
 import * as React from "react";
 
+import { useAuth } from "@/components/auth/auth-provider";
 import { AddTradeDialog } from "@/components/trades/add-trade-dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,6 +29,7 @@ function titleFromPath(pathname: string) {
 export function TopBar() {
   const pathname = usePathname();
   const title = titleFromPath(pathname);
+  const { authConfigured, authReady, isSignedIn, user } = useAuth();
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/70 backdrop-blur-xl">
@@ -61,7 +63,24 @@ export function TopBar() {
           </div>
         </div>
 
-        <AddTradeDialog />
+        <div className="flex items-center gap-2">
+          {authConfigured && authReady ? (
+            isSignedIn ? (
+              <Link
+                href="/settings#account"
+                className="hidden max-w-[140px] truncate rounded-lg border border-border px-3 py-2 text-xs text-muted-foreground hover:bg-muted/40 sm:block"
+                title={user?.email ?? undefined}
+              >
+                {user?.email ?? "Account"}
+              </Link>
+            ) : (
+              <Button variant="outline" size="sm" asChild className="hidden sm:inline-flex">
+                <Link href="/settings#account">Sign in</Link>
+              </Button>
+            )
+          ) : null}
+          <AddTradeDialog />
+        </div>
       </div>
     </header>
   );

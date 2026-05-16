@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import * as React from "react";
 
 import { ScreenshotQueue, type QueuedScreenshot } from "@/components/trades/screenshot-queue";
+import { useAuth } from "@/components/auth/auth-provider";
 import { useCanUploadToSupabase, useTrades } from "@/components/trades/trades-provider";
 import { Button } from "@/components/ui/button";
 import { uploadTradeScreenshots } from "@/lib/trades/upload-screenshots";
@@ -19,6 +20,7 @@ export function TradeExtraUpload({
   const router = useRouter();
   const { isLocalMode } = useTrades();
   const canUploadSupabase = useCanUploadToSupabase();
+  const { authConfigured, isSignedIn } = useAuth();
 
   const [queue, setQueue] = React.useState<QueuedScreenshot[]>([]);
   const [busy, setBusy] = React.useState(false);
@@ -63,8 +65,10 @@ export function TradeExtraUpload({
             {isLocalMode
               ? " — saved in this browser (demo mode)."
               : canUploadSupabase
-                ? " — requires Supabase sign-in."
-                : " — configure Supabase env vars to enable."}
+                ? " — uploads to your Supabase bucket."
+                : authConfigured && !isSignedIn
+                  ? " — sign in under Settings to upload."
+                  : " — configure Supabase env vars to enable."}
           </div>
         </div>
         <Button type="button" size="sm" onClick={() => void upload()} disabled={disabledUpload}>

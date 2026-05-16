@@ -28,9 +28,17 @@ Then run in **SQL Editor**:
 
 This allows authenticated users to upload/read/delete only under `{auth.uid()}/...`.
 
-## 3. Auth
+## 3. Auth (required for cloud screenshots)
 
-Enable at least one provider under **Authentication → Providers** (e.g. Email). Users must be signed in to save trades or upload screenshots to Supabase.
+1. **Authentication → Providers** — enable **Email** (magic link; no password required).
+2. **Authentication → URL configuration**
+   - **Site URL:** your production URL (e.g. `https://your-app.vercel.app`)
+   - **Redirect URLs** (add each environment):
+     - `http://localhost:3000/auth/callback`
+     - `https://your-app.vercel.app/auth/callback`
+3. In the app: **Settings → Account & cloud sync** — enter your email and open the link from your inbox.
+
+Users must be signed in to save trades to Postgres and upload screenshots to Storage.
 
 ## 4. Vercel environment variables
 
