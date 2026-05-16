@@ -24,6 +24,21 @@ import type {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatMoney, formatPct } from "@/lib/format";
 
+/** Coerces Recharts tooltip values (number | string | array | undefined) to a finite number. */
+function tooltipNumericValue(value: unknown): number {
+  if (typeof value === "number") return Number.isFinite(value) ? value : 0;
+  if (typeof value === "string") {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : 0;
+  }
+  if (Array.isArray(value)) return tooltipNumericValue(value[0]);
+  return 0;
+}
+
+function tooltipMoneyFormatted(value: unknown, label: string): [string, string] {
+  return [formatMoney(tooltipNumericValue(value)), label];
+}
+
 function MiniStat({
   label,
   value,
@@ -107,7 +122,7 @@ export function DashboardClient(props: {
                     borderRadius: 12,
                     color: "hsl(var(--foreground))",
                   }}
-                  formatter={(value: number) => [formatMoney(value), "P/L"]}
+                  formatter={(value) => tooltipMoneyFormatted(value, "P/L")}
                 />
                 <Bar dataKey="pnl" radius={[10, 10, 10, 10]}>
                   {monthly.map((entry) => (
@@ -165,7 +180,7 @@ export function DashboardClient(props: {
                     borderRadius: 12,
                     color: "hsl(var(--foreground))",
                   }}
-                  formatter={(value: number) => [formatMoney(value), "Equity"]}
+                  formatter={(value) => tooltipMoneyFormatted(value, "Equity")}
                 />
                 <Area type="monotone" dataKey="equity" stroke="hsl(var(--primary))" fillOpacity={1} fill="url(#eq)" />
               </AreaChart>
@@ -192,7 +207,7 @@ export function DashboardClient(props: {
                     borderRadius: 12,
                     color: "hsl(var(--foreground))",
                   }}
-                  formatter={(value: number) => [formatMoney(value), "P/L"]}
+                  formatter={(value) => tooltipMoneyFormatted(value, "P/L")}
                 />
                 <Bar dataKey="pnl" radius={[10, 10, 10, 10]}>
                   {weekday.map((entry) => (
