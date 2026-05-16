@@ -1,4 +1,7 @@
+import "server-only";
+
 import { buildTradeFromDraft } from "@/lib/trades/build-trade";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { CreateTradeResult, TradeDraft } from "@/lib/trades/types";
 import { shouldUseMockData } from "@/lib/mock-mode";
 
@@ -11,7 +14,6 @@ export async function createTrade(input: TradeDraft): Promise<CreateTradeResult>
   }
 
   try {
-    const { createSupabaseServerClient } = await import("@/lib/supabase/server");
     const supabase = await createSupabaseServerClient();
     if (!supabase) {
       return { id: trade.id, storage: "local", trade };

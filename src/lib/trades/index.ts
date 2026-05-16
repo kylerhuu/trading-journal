@@ -1,17 +1,15 @@
 export type { CreateTradeResult, TradeDraft, TradeStorageSource, UploadScreenshotResult } from "@/lib/trades/types";
-export { createTrade } from "@/lib/trades/create-trade";
 export { deriveRMultiple } from "@/lib/trades/derive-r-multiple";
 export { buildTradeFromDraft } from "@/lib/trades/build-trade";
 export { validateTradeForm, draftFromAutosave, draftToAutosave } from "@/lib/trades/validation";
 export {
-  fetchTrades,
   fetchTradesClientLocal,
-  fetchTradeById,
   fetchTradeByIdClientLocal,
-  fetchScreenshots,
   fetchScreenshotsClientLocal,
-  fetchDailyReviews,
-} from "@/lib/trades/fetch-trades";
+  fetchTradesFromBrowser,
+  fetchTradeByIdFromBrowser,
+  fetchScreenshotsFromBrowser,
+} from "@/lib/trades/fetch-trades.client";
 export { uploadTradeScreenshots } from "@/lib/trades/upload-screenshots";
 export {
   calculateDashboardStats,

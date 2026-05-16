@@ -16,17 +16,21 @@ export function TradeDetailClient({
   initialTrade: Trade | null;
 }) {
   const router = useRouter();
-  const { getTradeById, getScreenshots, refresh, loading } = useTrades();
-  const [screenshots, setScreenshots] = React.useState(() =>
-    initialTrade ? getScreenshots(tradeId) : [],
-  );
+  const { getTradeById, loadScreenshots, refresh, loading } = useTrades();
+  const [screenshots, setScreenshots] = React.useState<import("@/types/database").TradeScreenshot[]>([]);
 
   const trade = getTradeById(tradeId) ?? initialTrade;
 
   React.useEffect(() => {
-    if (!trade) return;
-    setScreenshots(getScreenshots(tradeId));
-  }, [trade, tradeId, getScreenshots]);
+    if (!tradeId) return;
+    let cancelled = false;
+    void loadScreenshots(tradeId).then((shots) => {
+      if (!cancelled) setScreenshots(shots);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [tradeId, loadScreenshots]);
 
   if (loading) {
     return <p className="text-sm text-muted-foreground">Loading trade…</p>;
@@ -50,8 +54,9 @@ export function TradeDetailClient({
       trade={trade}
       screenshots={screenshots}
       onScreenshotsChange={() => {
-        refresh();
-        setScreenshots(getScreenshots(tradeId));
+        void refresh().then(() =>
+          loadScreenshots(tradeId).then(setScreenshots),
+        );
         router.refresh();
       }}
     />

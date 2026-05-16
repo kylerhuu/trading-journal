@@ -1,20 +1,17 @@
-import { getScreenshotsForTrade, mockDailyReviews } from "@/lib/mock-data";
-import {
-  getScreenshotsForTradeLocal,
-  loadTradesFromLocalStorage,
-  seedLocalTradesIfEmpty,
-} from "@/lib/trades/local-store";
+import "server-only";
+
+import { mockDailyReviews, getScreenshotsForTrade } from "@/lib/mock-data";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { shouldUseMockData } from "@/lib/mock-mode";
 import type { DailyReview, Trade, TradeScreenshot } from "@/types/database";
 
-/** Server: Supabase trades, or empty (client hydrates localStorage). */
+/** Server: Supabase trades, or empty (client hydrates localStorage in demo mode). */
 export async function fetchTrades(): Promise<Trade[]> {
   if (shouldUseMockData()) {
     return [];
   }
 
   try {
-    const { createSupabaseServerClient } = await import("@/lib/supabase/server");
     const supabase = await createSupabaseServerClient();
     if (!supabase) return [];
 
@@ -26,19 +23,12 @@ export async function fetchTrades(): Promise<Trade[]> {
   }
 }
 
-/** Client: full trade list for local persistence mode. */
-export function fetchTradesClientLocal(): Trade[] {
-  const seeded = seedLocalTradesIfEmpty();
-  return seeded.length ? seeded : loadTradesFromLocalStorage();
-}
-
 export async function fetchTradeById(id: string): Promise<Trade | null> {
   if (shouldUseMockData()) {
     return null;
   }
 
   try {
-    const { createSupabaseServerClient } = await import("@/lib/supabase/server");
     const supabase = await createSupabaseServerClient();
     if (!supabase) return null;
 
@@ -50,17 +40,12 @@ export async function fetchTradeById(id: string): Promise<Trade | null> {
   }
 }
 
-export function fetchTradeByIdClientLocal(id: string): Trade | null {
-  return fetchTradesClientLocal().find((t) => t.id === id) ?? null;
-}
-
 export async function fetchScreenshots(tradeId: string): Promise<TradeScreenshot[]> {
   if (shouldUseMockData()) {
-    return getScreenshotsForTradeLocal(tradeId);
+    return [];
   }
 
   try {
-    const { createSupabaseServerClient } = await import("@/lib/supabase/server");
     const supabase = await createSupabaseServerClient();
     if (!supabase) return getScreenshotsForTrade(tradeId);
 
@@ -76,17 +61,10 @@ export async function fetchScreenshots(tradeId: string): Promise<TradeScreenshot
   }
 }
 
-export function fetchScreenshotsClientLocal(tradeId: string): TradeScreenshot[] {
-  const local = getScreenshotsForTradeLocal(tradeId);
-  if (local.length) return local;
-  return getScreenshotsForTrade(tradeId);
-}
-
 export async function fetchDailyReviews(): Promise<DailyReview[]> {
   if (shouldUseMockData()) return mockDailyReviews;
 
   try {
-    const { createSupabaseServerClient } = await import("@/lib/supabase/server");
     const supabase = await createSupabaseServerClient();
     if (!supabase) return mockDailyReviews;
 

@@ -1,5 +1,5 @@
 import { AppShell } from "@/components/layout/app-shell";
-import { fetchTrades } from "@/lib/trades/fetch-trades";
+import { fetchTrades } from "@/lib/trades/fetch-trades.server";
 
 export const dynamic = "force-dynamic";
 

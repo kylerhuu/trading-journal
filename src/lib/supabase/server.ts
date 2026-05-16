@@ -1,3 +1,5 @@
+import "server-only";
+
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
@@ -7,7 +9,6 @@ export async function createSupabaseServerClient() {
   if (!url || !anon) return null;
 
   try {
-    // Reject malformed URLs before @supabase/ssr throws during render.
     new URL(url);
   } catch {
     return null;

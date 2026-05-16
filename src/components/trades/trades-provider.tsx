@@ -6,8 +6,9 @@ import { createTradeAndReturnId } from "@/app/actions/trades";
 import type { CreateTradeResult, TradeDraft } from "@/lib/trades/types";
 import {
   fetchTradesClientLocal,
-  fetchScreenshotsClientLocal,
-} from "@/lib/trades/fetch-trades";
+  fetchTradesFromBrowser,
+  fetchScreenshotsFromBrowser,
+} from "@/lib/trades/fetch-trades.client";
 import { seedLocalTradesIfEmpty, upsertTradeLocal } from "@/lib/trades/local-store";
 import { isSupabaseConfigured, shouldUseMockData } from "@/lib/mock-mode";
 import type { Trade, TradeScreenshot } from "@/types/database";
@@ -16,10 +17,10 @@ interface TradesContextValue {
   trades: Trade[];
   loading: boolean;
   isLocalMode: boolean;
-  refresh: () => void;
+  refresh: () => Promise<void>;
   registerLocalTrade: (trade: Trade) => void;
   getTradeById: (id: string) => Trade | undefined;
-  getScreenshots: (tradeId: string) => TradeScreenshot[];
+  loadScreenshots: (tradeId: string) => Promise<TradeScreenshot[]>;
   saveTrade: (draft: TradeDraft) => Promise<CreateTradeResult>;
 }
 
@@ -36,9 +37,17 @@ export function TradesProvider({
   const [trades, setTrades] = React.useState<Trade[]>(initialTrades);
   const [loading, setLoading] = React.useState(isLocalMode);
 
-  const refresh = React.useCallback(() => {
+  const refresh = React.useCallback(async () => {
     if (isLocalMode) {
       setTrades(fetchTradesClientLocal());
+      return;
+    }
+    setLoading(true);
+    try {
+      const next = await fetchTradesFromBrowser();
+      setTrades(next);
+    } finally {
+      setLoading(false);
     }
   }, [isLocalMode]);
 
@@ -53,13 +62,10 @@ export function TradesProvider({
     setLoading(false);
   }, [initialTrades, isLocalMode]);
 
-  const registerLocalTrade = React.useCallback(
-    (trade: Trade) => {
-      upsertTradeLocal(trade);
-      setTrades(fetchTradesClientLocal());
-    },
-    [],
-  );
+  const registerLocalTrade = React.useCallback((trade: Trade) => {
+    upsertTradeLocal(trade);
+    setTrades(fetchTradesClientLocal());
+  }, []);
 
   const saveTrade = React.useCallback(
     async (draft: TradeDraft) => {
@@ -67,11 +73,17 @@ export function TradesProvider({
       if (result.storage === "local") {
         registerLocalTrade(result.trade);
       } else {
-        setTrades((prev) => [result.trade, ...prev.filter((t) => t.id !== result.trade.id)]);
+        const next = await fetchTradesFromBrowser();
+        setTrades(next.length ? next : [result.trade, ...trades.filter((t) => t.id !== result.trade.id)]);
       }
       return result;
     },
-    [registerLocalTrade, refresh],
+    [registerLocalTrade, trades],
+  );
+
+  const loadScreenshots = React.useCallback(
+    async (tradeId: string) => fetchScreenshotsFromBrowser(tradeId),
+    [],
   );
 
   const value = React.useMemo<TradesContextValue>(
@@ -82,10 +94,10 @@ export function TradesProvider({
       refresh,
       registerLocalTrade,
       getTradeById: (id) => trades.find((t) => t.id === id),
-      getScreenshots: (tradeId) => fetchScreenshotsClientLocal(tradeId),
+      loadScreenshots,
       saveTrade,
     }),
-    [trades, loading, isLocalMode, refresh, registerLocalTrade, saveTrade],
+    [trades, loading, isLocalMode, refresh, registerLocalTrade, loadScreenshots, saveTrade],
   );
 
   return <TradesContext.Provider value={value}>{children}</TradesContext.Provider>;
