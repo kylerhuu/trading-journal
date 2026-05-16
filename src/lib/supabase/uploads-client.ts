@@ -1,17 +1,19 @@
 "use client";
 
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 import type { QueuedScreenshot } from "@/components/trades/screenshot-queue";
 
 export async function uploadQueuedScreenshots(tradeId: string, queue: QueuedScreenshot[]) {
   if (!queue.length) return;
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anon) return;
+  const supabase = getSupabaseBrowserClient();
+  if (!supabase) {
+    throw new Error(
+      "Supabase browser client is unavailable. Check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.",
+    );
+  }
 
-  const supabase = createSupabaseBrowserClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

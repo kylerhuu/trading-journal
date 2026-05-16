@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 import type { Trade, TradeScreenshot } from "@/types/database";
 
 import { Badge } from "@/components/ui/badge";
@@ -116,8 +114,20 @@ export function TradeDetail(props: { trade: Trade; screenshots: TradeScreenshot[
           ) : (
             timeline.map((ss) => (
               <div key={ss.id} className="grid gap-4 rounded-xl border border-border bg-muted/10 p-4 lg:grid-cols-[280px_1fr]">
-                <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-muted">
-                  <Image alt={SHOT_LABEL[ss.type]} src={ss.image_url} fill className="object-cover" sizes="320px" />
+                <div className="relative aspect-[16/10] w-full overflow-hidden rounded-lg bg-muted">
+                  {isRenderableScreenshotUrl(ss.image_url) ? (
+                    <img
+                      src={ss.image_url}
+                      alt={SHOT_LABEL[ss.type]}
+                      className="absolute inset-0 h-full w-full object-cover"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <div className="flex h-full min-h-[180px] items-center justify-center p-4 text-center text-xs text-muted-foreground">
+                      Screenshot URL unavailable
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
@@ -144,6 +154,16 @@ function Stat({ k, v }: { k: string; v: string }) {
       <div className="mt-1 text-sm font-semibold">{v}</div>
     </div>
   );
+}
+
+function isRenderableScreenshotUrl(url: string | null | undefined): boolean {
+  if (!url?.trim()) return false;
+  try {
+    const u = new URL(url);
+    return u.protocol === "https:" || u.protocol === "http:";
+  } catch {
+    return false;
+  }
 }
 
 function Note({ title, body }: { title: string; body: string | null }) {

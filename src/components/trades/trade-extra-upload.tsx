@@ -7,6 +7,7 @@ import * as React from "react";
 import { ScreenshotQueue, type QueuedScreenshot } from "@/components/trades/screenshot-queue";
 import { Button } from "@/components/ui/button";
 import { uploadQueuedScreenshots } from "@/lib/supabase/uploads-client";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export function TradeExtraUpload({ tradeId }: { tradeId: string }) {
   const router = useRouter();
@@ -28,7 +29,9 @@ export function TradeExtraUpload({ tradeId }: { tradeId: string }) {
     }
   }
 
-  const disabledUpload = busy || !queue.length;
+  const canUpload = getSupabaseBrowserClient() !== null;
+
+  const disabledUpload = busy || !queue.length || !canUpload;
 
   return (
     <div className="space-y-3 rounded-xl border border-border bg-background/30 p-4">
@@ -37,6 +40,7 @@ export function TradeExtraUpload({ tradeId }: { tradeId: string }) {
           <div className="text-sm font-semibold">Add screenshots</div>
           <div className="mt-1 text-xs text-muted-foreground">
             Works with Supabase Storage bucket <span className="font-mono">trade-screenshots</span>.
+            {!canUpload ? " Add Supabase env vars to enable uploads." : ""}
           </div>
         </div>
         <Button type="button" size="sm" onClick={upload} disabled={disabledUpload}>

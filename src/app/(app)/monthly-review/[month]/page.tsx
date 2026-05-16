@@ -46,7 +46,8 @@ export default async function MonthlyReviewMonthPage(props: { params: Promise<{ 
   const rows: (typeof cells)[] = [];
   for (let i = 0; i < cells.length; i += 7) rows.push(cells.slice(i, i + 7));
 
-  const goalUsd = Number(process.env.MONTHLY_GOAL_USD ?? "5000");
+  const rawGoal = Number(process.env.MONTHLY_GOAL_USD ?? "5000");
+  const goalUsd = Number.isFinite(rawGoal) && rawGoal > 0 ? rawGoal : 5000;
   const progressPct = goalUsd > 0 ? Math.max(0, Math.min(100, Math.round((metrics.monthlyPnL / goalUsd) * 100))) : 0;
 
   return (

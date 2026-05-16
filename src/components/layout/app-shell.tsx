@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 
+import { DemoModeBanner } from "@/components/layout/demo-mode-banner";
 import { Sidebar } from "@/components/layout/sidebar";
 import { TopBar } from "@/components/layout/top-bar";
 
@@ -15,6 +16,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </Suspense>
       <div className="flex min-h-screen min-w-0 flex-1 flex-col">
         <TopBar />
+        <DemoModeBanner />
         <main className="flex-1 px-4 py-8 lg:px-10">{children}</main>
       </div>
     </div>
