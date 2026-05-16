@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { mockTrades } from "@/lib/mock-data";
+import { shouldUseMockData } from "@/lib/mock-mode";
 import type { Trade, TradeDirection } from "@/types/database";
 
 export interface TradeDraft {
@@ -28,14 +29,6 @@ export interface TradeDraft {
   mistake_tags?: string[];
 }
 
-function useMock(): boolean {
-  return (
-    process.env.NEXT_PUBLIC_SUPABASE_URL == null ||
-    process.env.NEXT_PUBLIC_SUPABASE_URL === "" ||
-    process.env.TRADING_JOURNAL_USE_MOCK === "true"
-  );
-}
-
 function deriveRMultiple(trade: Pick<TradeDraft, "pnl" | "risk_amount">): number | null {
   if (!trade.risk_amount) return null;
   return trade.pnl / trade.risk_amount;
@@ -44,7 +37,7 @@ function deriveRMultiple(trade: Pick<TradeDraft, "pnl" | "risk_amount">): number
 async function persistTrade(input: TradeDraft): Promise<{ id: string }> {
   const r_multiple = deriveRMultiple(input);
 
-  if (useMock()) {
+  if (shouldUseMockData()) {
     const row: Trade = {
       id: crypto.randomUUID(),
       user_id: "mock-user-id",

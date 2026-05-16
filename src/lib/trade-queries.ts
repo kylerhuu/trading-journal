@@ -1,16 +1,9 @@
 import { getScreenshotsForTrade, mockDailyReviews, mockTrades } from "@/lib/mock-data";
+import { shouldUseMockData } from "@/lib/mock-mode";
 import type { DailyReview, Trade, TradeScreenshot } from "@/types/database";
 
-function useMock(): boolean {
-  return (
-    process.env.NEXT_PUBLIC_SUPABASE_URL == null ||
-    process.env.NEXT_PUBLIC_SUPABASE_URL === "" ||
-    process.env.TRADING_JOURNAL_USE_MOCK === "true"
-  );
-}
-
 export async function fetchTrades(): Promise<Trade[]> {
-  if (useMock()) return mockTrades;
+  if (shouldUseMockData()) return mockTrades;
 
   const { createSupabaseServerClient } = await import("@/lib/supabase/server");
   const supabase = await createSupabaseServerClient();
@@ -22,7 +15,7 @@ export async function fetchTrades(): Promise<Trade[]> {
 }
 
 export async function fetchTradeById(id: string): Promise<Trade | null> {
-  if (useMock()) return mockTrades.find((t) => t.id === id) ?? null;
+  if (shouldUseMockData()) return mockTrades.find((t) => t.id === id) ?? null;
 
   const { createSupabaseServerClient } = await import("@/lib/supabase/server");
   const supabase = await createSupabaseServerClient();
@@ -34,7 +27,7 @@ export async function fetchTradeById(id: string): Promise<Trade | null> {
 }
 
 export async function fetchScreenshots(tradeId: string): Promise<TradeScreenshot[]> {
-  if (useMock()) return getScreenshotsForTrade(tradeId);
+  if (shouldUseMockData()) return getScreenshotsForTrade(tradeId);
 
   const { createSupabaseServerClient } = await import("@/lib/supabase/server");
   const supabase = await createSupabaseServerClient();
@@ -50,7 +43,7 @@ export async function fetchScreenshots(tradeId: string): Promise<TradeScreenshot
 }
 
 export async function fetchDailyReviews(): Promise<DailyReview[]> {
-  if (useMock()) return mockDailyReviews;
+  if (shouldUseMockData()) return mockDailyReviews;
 
   const { createSupabaseServerClient } = await import("@/lib/supabase/server");
   const supabase = await createSupabaseServerClient();
