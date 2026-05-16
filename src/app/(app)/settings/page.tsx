@@ -39,15 +39,15 @@ export default function SettingsPage() {
               <span className="font-mono text-foreground">daily_reviews</span>.
             </div>
             <div>
-              - Create a private bucket named <span className="font-mono text-foreground">trade-screenshots</span>.
+              - Create a <strong>public</strong> bucket named{" "}
+              <span className="font-mono text-foreground">trade-screenshots</span> (see{" "}
+              <span className="font-mono text-foreground">supabase/SETUP.md</span>).
             </div>
-            <div>- Add Storage policies so authenticated users can upload only under their user id prefix.</div>
             <div>
-              See{" "}
-              <Link className="underline underline-offset-4" href="https://supabase.com/docs/guides/storage">
-                Supabase Storage docs
-              </Link>{" "}
-              for policy patterns.
+              - Run <span className="font-mono text-foreground">supabase/storage-policies.sql</span> after creating the bucket.
+            </div>
+            <div>
+              Without Supabase, trades save to <span className="font-mono text-foreground">localStorage</span> in this browser.
             </div>
           </CardContent>
         </Card>

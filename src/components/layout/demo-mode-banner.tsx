@@ -18,8 +18,8 @@ export function DemoModeBanner() {
           <p className="text-xs leading-relaxed text-amber-100/90">
             {!configured ? (
               <>
-                Supabase URL or anon key is missing. Trades load from bundled sample data so the app stays usable.
-                Add env vars on Vercel, redeploy, and run the SQL migration.
+                Supabase is not configured. Trades save to this browser (localStorage) and demo seed data.
+                Add env vars on Vercel, redeploy, and run the SQL migration for cloud sync.
               </>
             ) : (
               <>TRADING_JOURNAL_USE_MOCK is enabled, so sample data replaces live Supabase queries.</>

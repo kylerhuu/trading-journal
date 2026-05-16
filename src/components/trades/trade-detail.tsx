@@ -15,8 +15,12 @@ const SHOT_LABEL: Record<TradeScreenshot["type"], string> = {
   higher_timeframe: "Higher timeframe",
 };
 
-export function TradeDetail(props: { trade: Trade; screenshots: TradeScreenshot[] }) {
-  const { trade, screenshots } = props;
+export function TradeDetail(props: {
+  trade: Trade;
+  screenshots: TradeScreenshot[];
+  onScreenshotsChange?: () => void;
+}) {
+  const { trade, screenshots, onScreenshotsChange } = props;
 
   const timeline = [...screenshots].sort((a, b) => a.created_at.localeCompare(b.created_at));
 
@@ -140,7 +144,7 @@ export function TradeDetail(props: { trade: Trade; screenshots: TradeScreenshot[
             ))
           )}
 
-          <TradeExtraUpload tradeId={trade.id} />
+          <TradeExtraUpload tradeId={trade.id} onUploaded={onScreenshotsChange} />
         </CardContent>
       </Card>
     </div>
@@ -160,7 +164,7 @@ function isRenderableScreenshotUrl(url: string | null | undefined): boolean {
   if (!url?.trim()) return false;
   try {
     const u = new URL(url);
-    return u.protocol === "https:" || u.protocol === "http:";
+    return u.protocol === "https:" || u.protocol === "http:" || u.protocol === "data:";
   } catch {
     return false;
   }
